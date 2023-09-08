@@ -34,6 +34,111 @@ export interface Database {
   }
   public: {
     Tables: {
+      comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          tweet_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          tweet_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          tweet_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_tweet_id_fkey"
+            columns: ["tweet_id"]
+            referencedRelation: "tweets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      likes: {
+        Row: {
+          created_at: string
+          id: string
+          tweet_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          tweet_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          tweet_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "likes_tweet_id_fkey"
+            columns: ["tweet_id"]
+            referencedRelation: "tweets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "likes_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string
+          first_name: string | null
+          id: string
+          last_name: string | null
+          name: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url: string
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          name: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          name?: string
+          username?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_id_fkey"
+            columns: ["id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       tweets: {
         Row: {
           content: string
@@ -57,7 +162,7 @@ export interface Database {
           {
             foreignKeyName: "tweets_user_id_fkey"
             columns: ["user_id"]
-            referencedRelation: "users"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           }
         ]

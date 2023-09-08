@@ -25,7 +25,7 @@ const Login: React.FC<LoginProps> = ({ className, ...props }) => {
   }
 
   return (
-    <Card className={cn('max-w-sm mx-auto', className)} {...props}>
+    <Card className={cn('mx-auto max-w-sm', className)} {...props}>
       <CardHeader>
         <CardTitle>Login</CardTitle>
       </CardHeader>
