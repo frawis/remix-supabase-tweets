@@ -4,6 +4,7 @@ import {
   ChatBubbleIcon,
   CopyIcon,
   HeartIcon,
+  Link1Icon,
   TwitterLogoIcon,
   UploadIcon,
 } from '@radix-ui/react-icons'
@@ -119,17 +120,47 @@ export default function SingleTweet() {
               <EditProfile profile={profile} />
             </div>
           </div>
-          <div>
-            {profile?.first_name && profile?.last_name ? (
+          <div className="mt-2 grid gap-2">
+            <div>
+              {profile?.first_name && profile?.last_name ? (
+                <div className="px-4">
+                  <div className="text-2xl font-bold">
+                    {profile?.first_name} {profile?.last_name}
+                  </div>
+                </div>
+              ) : null}
+              {profile?.username ? (
+                <div className="px-4">
+                  <div className="text-sm text-secondary-foreground">
+                    @{profile?.username}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+            {profile?.description ? (
               <div className="px-4">
-                <div className="text-2xl font-bold">
-                  {profile.first_name} {profile.last_name}
+                <div className="text-sm text-secondary-foreground">
+                  {profile?.description}
+                </div>
+              </div>
+            ) : null}
+            {profile?.website ? (
+              <div className="px-4">
+                <div className="text-sm text-secondary-foreground">
+                  <Link1Icon className="mr-1 inline-block" />
+                  <a
+                    href={profile?.website}
+                    target="_blank"
+                    rel="noreferrer nofollow"
+                  >
+                    {profile?.website}
+                  </a>
                 </div>
               </div>
             ) : null}
           </div>
         </div>
-        {tweets ? (
+        {tweets.length > 0 ? (
           <div className="mt-4 px-4">
             <Tabs defaultValue="tweets">
               <TabsList className="grid w-full grid-cols-2">

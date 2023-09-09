@@ -108,7 +108,7 @@ export interface Database {
       profiles: {
         Row: {
           avatar_url: string
-          description: Json | null
+          description: string | null
           first_name: string | null
           header_url: string | null
           id: string
@@ -119,7 +119,7 @@ export interface Database {
         }
         Insert: {
           avatar_url: string
-          description?: Json | null
+          description?: string | null
           first_name?: string | null
           header_url?: string | null
           id: string
@@ -130,7 +130,7 @@ export interface Database {
         }
         Update: {
           avatar_url?: string
-          description?: Json | null
+          description?: string | null
           first_name?: string | null
           header_url?: string | null
           id?: string

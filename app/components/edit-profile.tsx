@@ -115,8 +115,8 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
               <div className="mt-1">
                 <Input
                   name={username.name}
-                  defaultValue={profile?.username ?? ''}
                   placeholder="Username"
+                  value={profile?.username ?? undefined}
                   disabled={profile?.username !== null}
                 />
               </div>
@@ -126,11 +126,7 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
               <div className="mt-1">
                 <Textarea
                   name={description.name}
-                  defaultValue={
-                    profile?.description
-                      ? JSON.stringify(profile?.description, null, 2)
-                      : ''
-                  }
+                  defaultValue={profile?.description ?? ''}
                   placeholder="Bio"
                 />
               </div>
