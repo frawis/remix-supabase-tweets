@@ -26,6 +26,7 @@ const formSchema = z.object({
   name: z.string({ required_error: 'Name is required' }),
   first_name: z.string().optional(),
   last_name: z.string().optional(),
+  username: z.string().optional(),
   description: z
     .object({
       content: z.string(),
@@ -37,13 +38,14 @@ const formSchema = z.object({
 const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const editProfile = useFetcher()
-  const [form, { name, first_name, last_name, website, description }] = useForm(
-    {
-      onValidate({ formData }) {
-        return parse(formData, { schema: formSchema })
-      },
-    }
-  )
+  const [
+    form,
+    { name, first_name, last_name, website, description, username },
+  ] = useForm({
+    onValidate({ formData }) {
+      return parse(formData, { schema: formSchema })
+    },
+  })
 
   React.useEffect(() => {
     if (editProfile.data?.ok) {
@@ -106,6 +108,17 @@ const EditProfile: React.FC<EditProfileProps> = ({ profile }) => {
                     placeholder="e.g. Doe"
                   />
                 </div>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor={username.name}>Username</Label>
+              <div className="mt-1">
+                <Input
+                  name={username.name}
+                  defaultValue={profile?.username ?? ''}
+                  placeholder="Username"
+                  disabled={profile?.username !== null}
+                />
               </div>
             </div>
             <div>

@@ -10,3 +10,4 @@ node_modules
 /public/build
 .env
 .vercel
+supabase/config.toml

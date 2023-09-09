@@ -25,8 +25,8 @@ export default function Index() {
   }, [user, navigate])
 
   return (
-    <div className="py-8">
-      <div className="space-y-4 px-4">
+    <div className="px-4 py-8">
+      <div className="space-y-4">
         <div className="flex justify-center">
           <Logo className="h-12 w-12" />
         </div>
@@ -42,7 +42,7 @@ export default function Index() {
           GitHub account.
         </p>
       </div>
-      <div className="mt-8">
+      <div className="mx-auto mt-8 max-w-sm">
         <Login />
       </div>
     </div>

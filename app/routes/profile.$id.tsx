@@ -74,23 +74,21 @@ export default function SingleTweet() {
 
   return (
     <>
-      <div className="sticky top-0 z-30 h-16 border-b bg-background/5 backdrop-blur">
+      <div className="sticky top-0 z-30 border-b bg-background/5 backdrop-blur">
         {user ? (
-          <div className="p-4">
-            <div className="flex items-center gap-x-2">
-              <Link
-                to="/home"
-                className={cn(
-                  buttonVariants({ variant: 'ghost', size: 'icon' }),
-                  'rounded-full'
-                )}
-              >
-                <ArrowLeftIcon className="h-5 w-5" />
-              </Link>
-              <h1 className="text-lg font-extrabold">
-                {profile?.name ?? 'Profile'}
-              </h1>
-            </div>
+          <div className="flex h-16 items-center gap-x-2 p-4">
+            <Link
+              to="/home"
+              className={cn(
+                buttonVariants({ variant: 'ghost', size: 'icon' }),
+                'rounded-full'
+              )}
+            >
+              <ArrowLeftIcon className="h-5 w-5" />
+            </Link>
+            <h1 className="text-lg font-extrabold">
+              {profile?.name ?? 'Profile'}
+            </h1>
           </div>
         ) : null}
       </div>
@@ -149,9 +147,27 @@ export default function SingleTweet() {
                   {tweets?.map((tweet) => (
                     <Card key={tweet.id}>
                       <CardContent className="pt-4">
-                        {tweet.content}
+                        <div className="flex items-start">
+                          <div className="w-12 shrink-0">
+                            <div className="h-8 w-8 overflow-hidden rounded-full bg-primary/5 text-primary-foreground ring-1 ring-offset-2">
+                              {tweet?.profiles?.avatar_url ? (
+                                <img
+                                  src={tweet.profiles.avatar_url}
+                                  alt={tweet.profiles.name}
+                                />
+                              ) : null}
+                            </div>
+                          </div>
+                          <div className="flex-1">
+                            <div>
+                              <Link to={`/tweet/${tweet.id}`}>
+                                {tweet.content}
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
                       </CardContent>
-                      <CardFooter>
+                      <CardFooter className="pl-14">
                         <div className="flex w-full items-center justify-between">
                           <div className="text-sm text-secondary-foreground">
                             <Link

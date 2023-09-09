@@ -29,6 +29,7 @@ export async function action({ request }: ActionArgs) {
         last_name: String(newProfileData.last_name),
         website: String(newProfileData.website),
         description: String(newProfileData.description),
+        username: String(newProfileData.username),
       })
       .eq('id', String(user.id))
 
