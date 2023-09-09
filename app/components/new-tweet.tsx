@@ -1,6 +1,6 @@
 import { Form } from '@remix-run/react'
-import { Button } from './ui/button'
-import { Input } from './ui/input'
+import { Button } from '~/components/ui/button'
+import { Textarea } from '~/components/ui/textarea'
 
 interface NewTweetProps extends React.HTMLAttributes<HTMLDivElement> {
   user: any
@@ -18,7 +18,7 @@ const NewTweet = ({ user }: NewTweetProps) => {
       </div>
       <div className="flex-1 pr-4">
         <Form method="post" action="/api/tweet/new" className="grid gap-4">
-          <Input name="content" placeholder="What's your news?" />
+          <Textarea name="content" placeholder="What's your news?" />
           <div>
             <Button type="submit">Tweet</Button>
           </div>

@@ -108,27 +108,36 @@ export interface Database {
       profiles: {
         Row: {
           avatar_url: string
+          description: Json | null
           first_name: string | null
+          header_url: string | null
           id: string
           last_name: string | null
           name: string
           username: string | null
+          website: string | null
         }
         Insert: {
           avatar_url: string
+          description?: Json | null
           first_name?: string | null
+          header_url?: string | null
           id: string
           last_name?: string | null
           name: string
           username?: string | null
+          website?: string | null
         }
         Update: {
           avatar_url?: string
+          description?: Json | null
           first_name?: string | null
+          header_url?: string | null
           id?: string
           last_name?: string | null
           name?: string
           username?: string | null
+          website?: string | null
         }
         Relationships: [
           {

@@ -7,7 +7,6 @@ export default function AuthLayout() {
   }>()
   return (
     <div className="relative flex h-full items-center justify-center">
-      <div className="absolute inset-0 bg-gradient-to-tr from-primary-foreground to-primary-foreground/50" />
       <Outlet context={{ supabase }} />
     </div>
   )

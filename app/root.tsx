@@ -25,27 +25,47 @@ import {
 } from '@supabase/auth-helpers-remix'
 import { useEffect, useState } from 'react'
 
-import styles from './tailwind.css'
+import styles from '~/styles/tailwind.css'
+import fontStyles from '~/styles/font.css'
 import { type Theme, setTheme, getTheme } from '~/lib/theme.server'
-import { getHints, useHints } from './lib/client-hints'
-import { useRequestInfo } from './lib/request-info'
+import { getHints, useHints } from '~/lib/client-hints'
+import { useRequestInfo } from '~/lib/request-info'
 import { useForm } from '@conform-to/react'
 import { parse } from '@conform-to/zod'
 import { z } from 'zod'
-import { useNonce } from './lib/nonce-provider'
-import { invariantResponse } from './lib/utils'
-import { GeneralErrorBoundary } from './components/error-boundary'
-import { ErrorList } from './components/forms'
-import { TailwindIndicator } from './components/tailwind-indicator'
-import { TwitterLogoIcon } from '@radix-ui/react-icons'
+import { useNonce } from '~/lib/nonce-provider'
+import { cn, invariantResponse } from '~/lib/utils'
+import { GeneralErrorBoundary } from '~/components/error-boundary'
+import { ErrorList } from '~/components/forms'
+import { TailwindIndicator } from '~/components/tailwind-indicator'
+import {
+  ExitIcon,
+  MoonIcon,
+  PersonIcon,
+  SunIcon,
+  TwitterLogoIcon,
+} from '@radix-ui/react-icons'
+import { Logo } from '~/components/logo'
+import { Button } from './components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './components/ui/dropdown-menu'
+import { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar'
+import { Input } from './components/ui/input'
 
 const ThemeFormSchema = z.object({
-  theme: z.enum(['system', 'light', 'dark']),
+  theme: z.enum(['light', 'dark']),
 })
 
 export const links: LinksFunction = () => [
-  { rel: 'stylesheet', href: styles },
+  { rel: 'preload', as: 'style', href: fontStyles },
+  { rel: 'preload', as: 'style', href: styles },
   ...(cssBundleHref ? [{ rel: 'stylesheet', href: cssBundleHref }] : []),
+  { rel: 'stylesheet', href: fontStyles },
+  { rel: 'stylesheet', href: styles },
 ]
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -69,10 +89,17 @@ export const loader = async ({ request }: LoaderArgs) => {
     data: { session },
   } = await supabase.auth.getSession()
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', String(session?.user.id))
+    .single()
+
   return json(
     {
       env,
       session,
+      profile: profile,
       requestInfo: {
         hints: getHints(request),
         userPrefs: {
@@ -122,7 +149,7 @@ function Document({
   env?: Record<string, string>
 }) {
   return (
-    <html lang="en" className={`${theme} h-full overflow-x-hidden`}>
+    <html lang="en" className={`${theme} h-full overflow-x-hidden font-sans`}>
       <head>
         <Meta />
         <meta charSet="utf-8" />
@@ -157,6 +184,7 @@ export default function App() {
   )
   const serverAccessToken = data.session?.access_token
   const user = data.session?.user
+  const profile = data?.profile
 
   useEffect(() => {
     const {
@@ -178,86 +206,134 @@ export default function App() {
   const theme = useTheme()
   const nonce = useNonce()
 
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+  }
+
   return (
     <Document nonce={nonce} theme={theme} env={data.env}>
       <div className="flex h-screen flex-col justify-between">
-        <div className="xl:container">
+        <div className="h-full xl:container">
           <div className="hidden border-r sm:fixed sm:inset-y-0 sm:z-50 sm:flex sm:w-36 sm:flex-col md:w-56 lg:w-56">
             <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6 pb-4">
               <Link
                 to={user ? '/home' : '/login'}
                 className="flex h-16 shrink-0 items-center"
               >
-                <img
-                  className="h-8 w-auto"
-                  src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                  alt="Your Company"
-                />
+                <Logo />
               </Link>
-              <nav className="flex flex-1 flex-col">
-                <ul className="flex flex-1 flex-col gap-y-7">
-                  <li>
-                    <NavLink
-                      to="/home"
-                      className="group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
-                    >
-                      <TwitterLogoIcon className="h-6 w-6 shrink-0" />
-                      <span className="sm:hidden md:block">Tweet</span>
-                    </NavLink>
-                  </li>
-                  <li className="mt-auto">
-                    {user ? (
-                      <div>
+              {user ? (
+                <nav className="flex flex-1 flex-col">
+                  <ul className="flex flex-1 flex-col gap-y-2">
+                    <li>
+                      <NavLink
+                        to="/home"
+                        className={({ isActive }) =>
+                          cn(
+                            'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 tracking-wide',
+                            isActive
+                              ? 'bg-primary text-primary-foreground'
+                              : 'text-secondary-foreground hover:bg-primary hover:text-primary-foreground'
+                          )
+                        }
+                      >
+                        <TwitterLogoIcon className="h-6 w-6 shrink-0" />
+                        <span className="sm:hidden md:block">Tweets</span>
+                      </NavLink>
+                    </li>
+                    <li>
+                      <NavLink
+                        to={`/profile/${user.id}`}
+                        className={({ isActive }) =>
+                          cn(
+                            'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 tracking-wide',
+                            isActive
+                              ? 'bg-primary text-primary-foreground'
+                              : 'text-secondary-foreground hover:bg-primary hover:text-primary-foreground'
+                          )
+                        }
+                      >
+                        <PersonIcon className="h-6 w-6 shrink-0" />
+                        <span className="sm:hidden md:block">Profile</span>
+                      </NavLink>
+                    </li>
+                    <li className="mt-auto">
+                      <div className="flex items-center gap-x-1">
+                        {profile ? (
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="gap-x-1"
+                              >
+                                {profile.avatar_url ? (
+                                  <Avatar className="h-6 w-6">
+                                    <AvatarImage
+                                      src={profile.avatar_url}
+                                      alt={profile.name}
+                                    />
+                                    <AvatarFallback>
+                                      {profile?.first_name
+                                        ?.slice(0)
+                                        .toLocaleUpperCase() +
+                                        ' ' +
+                                        profile?.last_name
+                                          ?.slice(0)
+                                          .toLocaleUpperCase() ?? 'N.N.'}
+                                    </AvatarFallback>
+                                  </Avatar>
+                                ) : null}
+                                <span>
+                                  {profile.name ?? user.email ?? 'N.N.'}
+                                </span>
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className="w-48">
+                              <DropdownMenuItem asChild>
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={handleLogout}
+                                  className="w-full justify-start"
+                                >
+                                  <ExitIcon className="mr-1 h-5 w-5" />
+                                  Logout
+                                </Button>
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        ) : null}
                         <ThemeSwitch
                           userPreference={data.requestInfo.userPrefs.theme}
                         />
-                        <p>Logged in</p>
                       </div>
-                    ) : (
-                      <div>
-                        <p>Logged out</p>
-                      </div>
-                    )}
-                  </li>
-                </ul>
-              </nav>
+                    </li>
+                  </ul>
+                </nav>
+              ) : null}
             </div>
           </div>
-          <div className="flex sm:pl-36 md:pl-56 lg:pl-56">
+          <div className="flex h-full sm:pl-36 md:pl-56 lg:pl-56">
             <div className="flex-1">
-              <div className="sticky top-0 h-16 bg-background/5 backdrop-blur">
-                {user ? (
-                  <div>
-                    <p>Logged in Header</p>
-                  </div>
-                ) : (
-                  <div>
-                    <p>Logged out</p>
-                  </div>
-                )}
-              </div>
-              <main className="py-10">
-                {user ? (
-                  <Outlet context={{ supabase }} />
-                ) : (
-                  <div>
-                    <p>Logged out</p>
-                  </div>
-                )}
-              </main>
+              <Outlet context={{ supabase, user }} />
             </div>
             {user ? (
               <aside className="hidden border-l lg:block lg:basis-80">
-                <div className="bg-gray sticky top-0 h-16">Search</div>
+                <div className="bg-gray sticky top-0 h-16">
+                  <div className="bg-background p-4">
+                    <Input type="search" placeholder="Search..." />
+                  </div>
+                </div>
                 <section className="py-10">
-                  <div className="min-h-screen">Sidebar</div>
+                  <div className="min-h-screen">
+                    <div className="p-4">
+                      <p>Who to follow</p>
+                    </div>
+                  </div>
                 </section>
               </aside>
-            ) : (
-              <div>
-                <p>Logged out</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
@@ -274,7 +350,7 @@ export function useTheme() {
   const requestInfo = useRequestInfo()
   const optimisticMode = useOptimisticThemeMode()
   if (optimisticMode) {
-    return optimisticMode === 'system' ? hints.theme : optimisticMode
+    return optimisticMode === 'light' ? hints.theme : optimisticMode
   }
   return requestInfo.userPrefs.theme ?? hints.theme
 }
@@ -310,26 +386,19 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
   })
 
   const optimisticMode = useOptimisticThemeMode()
-  const mode = optimisticMode ?? userPreference ?? 'system'
-  const nextMode =
-    mode === 'system' ? 'light' : mode === 'light' ? 'dark' : 'system'
+  const mode = optimisticMode ?? userPreference ?? 'light'
+  const nextMode = mode === 'light' ? 'dark' : 'light'
   const modeLabel = {
     light: (
       <div>
-        sun
+        <MoonIcon className="h-5 w-5" />
         <span className="sr-only">Light</span>
       </div>
     ),
     dark: (
       <div>
-        moon
+        <SunIcon className="h-5 w-5" />
         <span className="sr-only">Dark</span>
-      </div>
-    ),
-    system: (
-      <div>
-        laptop
-        <span className="sr-only">System</span>
       </div>
     ),
   }
@@ -338,14 +407,15 @@ function ThemeSwitch({ userPreference }: { userPreference?: Theme | null }) {
     <fetcher.Form method="POST" {...form.props}>
       <input type="hidden" name="theme" value={nextMode} />
       <div className="flex gap-2">
-        <button
+        <Button
           name="intent"
           value="update-theme"
           type="submit"
-          className="flex h-8 w-8 cursor-pointer items-center justify-center"
+          size="icon"
+          variant="ghost"
         >
           {modeLabel[mode]}
-        </button>
+        </Button>
       </div>
       <ErrorList errors={form.errors} id={form.errorId} />
     </fetcher.Form>
