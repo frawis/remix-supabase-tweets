@@ -1,40 +1,50 @@
-> **Warning**  
-> The `@remix-run/vercel` runtime adapter has been deprecated in favor of out of
-> the box Vercel functionality and will be removed in Remix v2.  
-> This means you don't have to use the Vercel template & can just use the Remix
-> template instead.
+# Welcome to Remix Supabase Tweets!
 
-# Welcome to Remix!
+This is a simple demo app that shows how to use [Remix](https://remix.run) with [Supabase](https://supabase.com) to create a Twitter clone.
 
 - [Remix Docs](https://remix.run/docs)
-
-## Deployment
-
-After having run the `create-remix` command and selected "Vercel" as a deployment target, you only need to [import your Git repository](https://vercel.com/new) into Vercel, and it will be deployed.
-
-If you'd like to avoid using a Git repository, you can also deploy the directory by running [Vercel CLI](https://vercel.com/cli):
-
-```sh
-npm i -g vercel
-vercel
-```
-
-It is generally recommended to use a Git repository, because future commits will then automatically be deployed by Vercel, through its [Git Integration](https://vercel.com/docs/concepts/git).
+- [Supabase Docs](https://supabase.com/docs)
+- [UI (Shadcn)](https://ui.shadcn.com/)
 
 ## Development
 
 To run your Remix app locally, make sure your project's local dependencies are installed:
 
 ```sh
-npm install
+pnpm install
 ```
 
 Afterwards, start the Remix development server like so:
 
 ```sh
-npm run dev
+pnpm run dev
 ```
 
 Open up [http://localhost:3000](http://localhost:3000) and you should be ready to go!
 
-If you're used to using the `vercel dev` command provided by [Vercel CLI](https://vercel.com/cli) instead, you can also use that, but it's not needed.
+## Supabase
+
+### Setup
+
+Add a new function to your Supabase project called `insert_profile_for_new_user` with the following SQL as return type `trigger` and under advanced settings set `SECURITY DEFINER`:
+
+```sql
+begin
+  insert into public.profiles(id, name, username, avatar_url)
+  values (
+    new.id,
+    new.raw_user_meta_data->>'name',
+    new.raw_user_meta_data->>'user_name',
+    new.raw_user_meta_data->>'avatar_url'
+  );
+  return new;
+end;
+```
+
+Next setup a new trigger on the `auth.users` table with the following settings:
+
+- Trigger name: `on_auth.users_insert`
+- Events: `Insert`
+- Type: `After the event`
+- Orientation: `Row`
+- Function: `insert_profile_for_new_user`
